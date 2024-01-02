@@ -1,0 +1,22 @@
+{
+    "name": "txr-cli",
+    "version": "1.0.0",
+    "description": "CLI tool for managing changelogs",
+    "main": "bin/txr.js",
+    "bin": {
+        "txr": "./bin/txr.js"
+    },
+    "scripts": {
+        "start": "node ./bin/txr.js"
+    },
+    "keywords": [
+        "changelog",
+        "cli",
+        "txr"
+    ],
+    "author": "Cody Yu",
+    "license": "MIT",
+    "dependencies": {
+        "yargs": "^17.7.2"
+    }
+}
