@@ -4,6 +4,7 @@ const path = require('path');
 const changelog = require('../src/changelog');
 
 const changelogFile = path.join(process.cwd(), "CHANGELOG.txt");
+const backupFile = changelogFile + '.backup';
 
 // 測試初始化changelog
 function testInitChangelog() {
