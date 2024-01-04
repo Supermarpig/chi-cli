@@ -1,0 +1,149 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件操作界面</title>
+</head>
+<style>
+    pre {
+        white-space: pre-wrap;
+        /* 換行 */
+        word-wrap: break-word;
+        /* 斷字 */
+        max-width: 600px;
+        /* 最大寬度 */
+    }
+
+    .json-highlight {
+        font-family: monospace;
+        /* 等寬字型 */
+        color: #333;
+        /* 文字顏色 */
+        background-color: #f7f7f7;
+        /* 背景顏色 */
+        border: 1px solid #ccc;
+        /* 邊框 */
+        padding: 10px;
+        /* 內距 */
+        border-radius: 4px;
+        /* 圓角 */
+        margin-top: 10px;
+        /* 上邊距 */
+    }
+</style>
+
+<body>
+    <h1>文件操作界面</h1>
+
+    <!-- 文件名輸入區塊 -->
+    <div>
+        <select id="file-name">
+            <option value="">選擇一個文件...</option>
+            <!-- 文件選項將在這裡填充 -->
+        </select>
+    </div>
+    <!-- 查詢區塊 -->
+    <div>
+        <button id="read-button">查詢文件內容</button>
+        <pre id="file-content">文件內容將顯示在這裡...</pre>
+    </div>
+
+    <!-- 修改區塊 -->
+    <div>
+        <textarea id="new-content" rows="4" cols="50">輸入新的文件內容...</textarea>
+        <button id="write-button">修改文件內容</button>
+    </div>
+
+    <!-- 刪除區塊 -->
+    <div>
+        <button id="delete-button">刪除文件</button>
+    </div>
+
+    <script>
+        function getFileName() {
+            return document.getElementById('file-name').value;
+        }
+
+        // 處理查詢按鈕的點擊
+        document.getElementById('read-button').addEventListener('click', () => {
+                const fileName = getFileName();
+                const fileContentElement = document.getElementById('file-content');
+                fetch(`/read?fileName=${encodeURIComponent(fileName)}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        // 檢查文件是否是 JSON
+                        if (fileName.endsWith('.json')) {
+                            try {
+                                // 嘗試解析 JSON 並美化
+                                const jsonObj = JSON.parse(data);
+                                const prettyJson = JSON.stringify(jsonObj, null, 2);
+                                fileContentElement.textContent = prettyJson;
+                                fileContentElement.className = 'json-highlight';
+                            } catch (error) {
+                                fileContentElement.textContent = '無法解析 JSON 內容';
+                            }
+                        } else {
+                            // 對於普通文本文件
+                            fileContentElement.textContent = data;
+                            fileContentElement.className = ''; // 移除任何特殊樣式
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        fileContentElement.textContent = '無法讀取文件';
+                    });
+            });
+        // 處理修改按鈕的點擊
+        document.getElementById('write-button').addEventListener('click', () => {
+            const fileName = getFileName();
+            const newContent = document.getElementById('new-content').value;
+            fetch('/write', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `fileName=${encodeURIComponent(fileName)}&content=${encodeURIComponent(newContent)}`
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        // 處理刪除按鈕的點擊
+        document.getElementById('delete-button').addEventListener('click', () => {
+            const fileName = getFileName();
+            fetch(`/delete?fileName=${encodeURIComponent(fileName)}`, { method: 'DELETE' })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        //新增資料夾內文件選取
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/list-files')
+                .then(response => response.json())
+                .then(files => {
+                    const select = document.getElementById('file-name');
+                    files.forEach(file => {
+                        const option = document.createElement('option');
+                        option.value = option.textContent = file;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+
+</html>

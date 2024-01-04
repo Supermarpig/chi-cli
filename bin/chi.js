@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 
-const yargs = require("yargs/yargs");
-const { hideBin } = require("yargs/helpers");
-const changelog = require("../src/changelog");
+import yargs from "yargs/yargs";
+import { hideBin } from "yargs/helpers";
+import changelog from "../src/changelog.js";
 // 引入測試函數
-const runTests = require('../test/changelog.test');
+import runTests from '../test/changelog.test.js';
+// 引入伺服器模組
+import { start } from "../server.js";
+
 
 const argv = yargs(hideBin(process.argv))
   .command("init", "Create a new, empty changelog", () => {
     changelog.initChangelog();
+  })
+  .command('start', 'Start the JSON server', () => {
+    start();
   })
   .command("add", "Adds a new line to the changelog", (yargs) => {
     return yargs.option("m", {
@@ -19,10 +25,10 @@ const argv = yargs(hideBin(process.argv))
     });
   }, (argv) => {
     const message = argv.message;
-    changelog.addEntry(message);
+    addEntry(message);
   })
   .command("release", "Marks the current changelog as released", () => {
-    changelog.releaseChangelog();
+    releaseChangelog();
   })
   .command("show", "Show the last or a specific version changelog", (yargs) => {
     return yargs.option("v", {
@@ -35,7 +41,7 @@ const argv = yargs(hideBin(process.argv))
     changelog.showChangelog(version);
   })
   .command("list", "List all versions in the changelog", () => {
-    changelog.listVersions();
+    listVersions();
   })
   .command("add-version", "Adds a new version to the changelog", (yargs) => {
     return yargs.option("v", {

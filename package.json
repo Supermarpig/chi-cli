@@ -3,8 +3,9 @@
     "version": "1.0.0",
     "description": "CLI tool for managing changelogs",
     "main": "bin/chi.js",
+    "type": "module",
     "bin": {
-        "food": "./bin/chi.js"
+        "chi": "./bin/chi.js"
     },
     "scripts": {
         "start": "node ./bin/chi.js"

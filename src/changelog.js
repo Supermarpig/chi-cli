@@ -1,11 +1,11 @@
-const fs = require("fs");
-const path = require("path");
+import { existsSync, writeFileSync, appendFileSync, readFileSync } from "fs";
+import { join } from "path";
 
-const changelogFile = path.join(process.cwd(), "CHANGELOG.txt");
+const changelogFile = join(process.cwd(), "CHANGELOG.txt");
 
 function initChangelog() {
-    if (!fs.existsSync(changelogFile)) {
-        fs.writeFileSync(changelogFile, "");
+    if (!existsSync(changelogFile)) {
+        writeFileSync(changelogFile, "");
         console.log("New changelog created.");
     } else {
         console.log("Changelog already exists.");
@@ -17,19 +17,19 @@ function addEntry(message) {
     const now = new Date();
     const localDateTime = now.toLocaleString();
     const entry = `${localDateTime}: ${message}\n`;
-    fs.appendFileSync(changelogFile, entry);
+    appendFileSync(changelogFile, entry);
     console.log("Entry added.");
 }
 
 function addVersion(version, description) {
-    if (!fs.existsSync(changelogFile)) {
+    if (!existsSync(changelogFile)) {
         console.log("Changelog does not exist. Please initialize it first.");
         return;
     }
 
     const versionHeader = `## [${version}] - ${new Date().toISOString().split('T')[0]}\n`;
     const versionContent = `${versionHeader}${description}\n\n`;
-    const changelogContent = fs.readFileSync(changelogFile, 'utf8');
+    const changelogContent = readFileSync(changelogFile, 'utf8');
 
     // 檢查該版本是否已經存在
     if (changelogContent.includes(`## [${version}]`)) {
@@ -39,17 +39,17 @@ function addVersion(version, description) {
 
     // 將新版本添加到文件開頭（或其他適當的位置）
     const updatedChangelogContent = versionContent + changelogContent;
-    fs.writeFileSync(changelogFile, updatedChangelogContent);
+    writeFileSync(changelogFile, updatedChangelogContent);
     console.log(`Version ${version} added.`);
 }
 
 function releaseChangelog() {
-    if (!fs.existsSync(changelogFile)) {
+    if (!existsSync(changelogFile)) {
         console.log("Changelog does not exist.");
         return;
     }
 
-    let changelogContent = fs.readFileSync(changelogFile, 'utf8');
+    let changelogContent = readFileSync(changelogFile, 'utf8');
     const releaseDate = new Date().toISOString().split('T')[0]; // 只獲取日期部分
     const releaseHeader = `## Released on ${releaseDate}\n\n`;
 
@@ -61,18 +61,18 @@ function releaseChangelog() {
 
     // 在文件開頭添加發布標記
     changelogContent = releaseHeader + changelogContent;
-    fs.writeFileSync(changelogFile, changelogContent);
+    writeFileSync(changelogFile, changelogContent);
     console.log("Changelog marked as released.");
 }
 
 function showChangelog(version) {
     // 如果 changelog 文件不存在
-    if (!fs.existsSync(changelogFile)) {
+    if (!existsSync(changelogFile)) {
         console.log("Changelog does not exist.");
         return;
     }
 
-    const changelogContent = fs.readFileSync(changelogFile, 'utf8');
+    const changelogContent = readFileSync(changelogFile, 'utf8');
     if (version) {
         // 如果指定了版本，則查找該版本的 changelog
         const versionPattern = new RegExp(`## \\[${version}\\].*?(?=## \\[|$)`, 'gs');
@@ -94,12 +94,12 @@ function showChangelog(version) {
 
 function listVersions() {
     // 如果 changelog 文件不存在
-    if (!fs.existsSync(changelogFile)) {
+    if (!existsSync(changelogFile)) {
         console.log("Changelog does not exist.");
         return;
     }
 
-    const changelogContent = fs.readFileSync(changelogFile, 'utf8');
+    const changelogContent = readFileSync(changelogFile, 'utf8');
     const versionPattern = /## \[(.*?)\]/g;
     let match;
     const versions = [];
@@ -115,7 +115,7 @@ function listVersions() {
     }
 }
 
-module.exports = {
+export default {
     initChangelog,
     addEntry,
     addVersion,
