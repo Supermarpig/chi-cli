@@ -1,18 +1,18 @@
 {
-    "name": "txr-cli",
+    "name": "chi-cli",
     "version": "1.0.0",
     "description": "CLI tool for managing changelogs",
-    "main": "bin/txr.js",
+    "main": "bin/chi.js",
     "bin": {
-        "txr": "./bin/txr.js"
+        "food": "./bin/chi.js"
     },
     "scripts": {
-        "start": "node ./bin/txr.js"
+        "start": "node ./bin/chi.js"
     },
     "keywords": [
         "changelog",
         "cli",
-        "txr"
+        "chi"
     ],
     "author": "Cody Yu",
     "license": "MIT",
