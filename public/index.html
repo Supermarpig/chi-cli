@@ -8,21 +8,25 @@
     <title>文件操作界面</title>
 </head>
 <style>
-    html,body{
+    html,
+    body {
         width: 100%;
         padding: 0;
         margin: 0;
     }
+
     pre {
         white-space: pre-wrap;
         word-wrap: break-word;
         max-width: 600px;
     }
-    .root{
+
+    .root {
         display: flex;
         width: 100%;
         height: auto;
     }
+
     .json-highlight {
         font-family: monospace;
         color: #333;
@@ -34,7 +38,9 @@
         width: 100%;
         min-width: 500px;
     }
-    .text-block,.show-block{
+
+    .text-block,
+    .show-block {
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -47,7 +53,7 @@
 <body>
     <div class="root">
         <div class="show-block">
-            <h1>文件操作界面</h1>
+            <h1>文件操作界面6667888</h1>
             <!-- 文件名輸入區塊 -->
             <div>
                 <select id="file-name">
@@ -61,14 +67,14 @@
                 <pre id="file-content">文件內容將顯示在這裡...</pre>
             </div>
         </div>
-    
+
         <div class="text-block">
             <!-- 修改區塊 -->
             <div>
                 <textarea id="new-content" rows="4" cols="50">輸入新的文件內容...</textarea>
                 <button id="write-button">修改文件內容</button>
             </div>
-        
+
             <!-- 刪除區塊 -->
             <div>
                 <button id="delete-button">刪除文件</button>
@@ -83,33 +89,33 @@
 
         // 處理查詢按鈕的點擊
         document.getElementById('read-button').addEventListener('click', () => {
-                const fileName = getFileName();
-                const fileContentElement = document.getElementById('file-content');
-                fetch(`/read?fileName=${encodeURIComponent(fileName)}`)
-                    .then(response => response.text())
-                    .then(data => {
-                        // 檢查文件是否是 JSON
-                        if (fileName.endsWith('.json')) {
-                            try {
-                                // 嘗試解析 JSON 並美化
-                                const jsonObj = JSON.parse(data);
-                                const prettyJson = JSON.stringify(jsonObj, null, 2);
-                                fileContentElement.textContent = prettyJson;
-                                fileContentElement.className = 'json-highlight';
-                            } catch (error) {
-                                fileContentElement.textContent = '無法解析 JSON 內容';
-                            }
-                        } else {
-                            // 對於普通文本文件
-                            fileContentElement.textContent = data;
-                            fileContentElement.className = ''; // 移除任何特殊樣式
+            const fileName = getFileName();
+            const fileContentElement = document.getElementById('file-content');
+            fetch(`/read?fileName=${encodeURIComponent(fileName)}`)
+                .then(response => response.text())
+                .then(data => {
+                    // 檢查文件是否是 JSON
+                    if (fileName.endsWith('.json')) {
+                        try {
+                            // 嘗試解析 JSON 並美化
+                            const jsonObj = JSON.parse(data);
+                            const prettyJson = JSON.stringify(jsonObj, null, 2);
+                            fileContentElement.textContent = prettyJson;
+                            fileContentElement.className = 'json-highlight';
+                        } catch (error) {
+                            fileContentElement.textContent = '無法解析 JSON 內容';
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        fileContentElement.textContent = '無法讀取文件';
-                    });
-            });
+                    } else {
+                        // 對於普通文本文件
+                        fileContentElement.textContent = data;
+                        fileContentElement.className = ''; // 移除任何特殊樣式
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    fileContentElement.textContent = '無法讀取文件';
+                });
+        });
         // 處理修改按鈕的點擊
         document.getElementById('write-button').addEventListener('click', () => {
             const fileName = getFileName();

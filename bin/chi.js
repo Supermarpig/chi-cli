@@ -6,7 +6,7 @@ import changelog from "../src/changelog.js";
 // 引入測試函數
 import runTests from '../test/changelog.test.js';
 // 引入伺服器模組
-import { startMon } from "../src/hot-reload.mjs";
+import { start } from "../server.js";
 
 
 const argv = yargs(hideBin(process.argv))
@@ -14,7 +14,7 @@ const argv = yargs(hideBin(process.argv))
     changelog.initChangelog();
   })
   .command('start', 'Start the JSON server', () => {
-    startMon();
+    start();
   })
   .command("add", "Adds a new line to the changelog", (yargs) => {
     return yargs.option("m", {
