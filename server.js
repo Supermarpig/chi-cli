@@ -70,4 +70,6 @@ server.listen(port, hostname, () => {
 
 }
 
+start();
+
 export { start };
