@@ -8,58 +8,72 @@
     <title>文件操作界面</title>
 </head>
 <style>
+    html,body{
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
     pre {
         white-space: pre-wrap;
-        /* 換行 */
         word-wrap: break-word;
-        /* 斷字 */
         max-width: 600px;
-        /* 最大寬度 */
     }
-
+    .root{
+        display: flex;
+        width: 100%;
+        height: auto;
+    }
     .json-highlight {
         font-family: monospace;
-        /* 等寬字型 */
         color: #333;
-        /* 文字顏色 */
         background-color: #f7f7f7;
-        /* 背景顏色 */
         border: 1px solid #ccc;
-        /* 邊框 */
         padding: 10px;
-        /* 內距 */
         border-radius: 4px;
-        /* 圓角 */
         margin-top: 10px;
-        /* 上邊距 */
+        width: 100%;
+        min-width: 500px;
+    }
+    .text-block,.show-block{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
     }
 </style>
 
 <body>
-    <h1>文件操作界面</h1>
-
-    <!-- 文件名輸入區塊 -->
-    <div>
-        <select id="file-name">
-            <option value="">選擇一個文件...</option>
-            <!-- 文件選項將在這裡填充 -->
-        </select>
-    </div>
-    <!-- 查詢區塊 -->
-    <div>
-        <button id="read-button">查詢文件內容</button>
-        <pre id="file-content">文件內容將顯示在這裡...</pre>
-    </div>
-
-    <!-- 修改區塊 -->
-    <div>
-        <textarea id="new-content" rows="4" cols="50">輸入新的文件內容...</textarea>
-        <button id="write-button">修改文件內容</button>
-    </div>
-
-    <!-- 刪除區塊 -->
-    <div>
-        <button id="delete-button">刪除文件</button>
+    <div class="root">
+        <div class="show-block">
+            <h1>文件操作界面</h1>
+            <!-- 文件名輸入區塊 -->
+            <div>
+                <select id="file-name">
+                    <option value="">選擇一個文件...</option>
+                    <!-- 文件選項將在這裡填充 -->
+                </select>
+            </div>
+            <!-- 查詢區塊 -->
+            <div>
+                <button id="read-button">查詢文件內容</button>
+                <pre id="file-content">文件內容將顯示在這裡...</pre>
+            </div>
+        </div>
+    
+        <div class="text-block">
+            <!-- 修改區塊 -->
+            <div>
+                <textarea id="new-content" rows="4" cols="50">輸入新的文件內容...</textarea>
+                <button id="write-button">修改文件內容</button>
+            </div>
+        
+            <!-- 刪除區塊 -->
+            <div>
+                <button id="delete-button">刪除文件</button>
+            </div>
+        </div>
     </div>
 
     <script>
