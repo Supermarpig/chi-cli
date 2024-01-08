@@ -27,6 +27,12 @@
         height: auto;
     }
 
+    @media (max-width: 980px) {
+        .root {
+            flex-direction: column;
+        }
+    }
+
     .json-highlight {
         font-family: monospace;
         color: #333;
@@ -45,15 +51,30 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         padding: 10px;
+        margin-right: 10px;
+    }
+
+    .content-block {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #new-content {
+        min-width: 600px;
+        min-height: 500px;
+    }
+
+    .button {
+        margin-top: 10px;
     }
 </style>
 
 <body>
     <div class="root">
         <div class="show-block">
-            <h1>文件操作界面6667888</h1>
+            <h1>文件操作界面</h1>
             <!-- 文件名輸入區塊 -->
             <div>
                 <select id="file-name">
@@ -63,98 +84,73 @@
             </div>
             <!-- 查詢區塊 -->
             <div>
-                <button id="read-button">查詢文件內容</button>
                 <pre id="file-content">文件內容將顯示在這裡...</pre>
             </div>
         </div>
 
         <div class="text-block">
             <!-- 修改區塊 -->
-            <div>
+            <div class="content-block">
                 <textarea id="new-content" rows="4" cols="50">輸入新的文件內容...</textarea>
-                <button id="write-button">修改文件內容</button>
+                <button id="write-button" class="button">修改文件內容</button>
             </div>
 
             <!-- 刪除區塊 -->
             <div>
-                <button id="delete-button">刪除文件</button>
+                <button id="delete-button" class="button">刪除文件</button>
             </div>
         </div>
     </div>
 
     <script>
-        function getFileName() {
-            return document.getElementById('file-name').value;
+        // 獲取元素的函數
+        function getElement(id) {
+            return document.getElementById(id);
         }
 
-        // 處理查詢按鈕的點擊
-        document.getElementById('read-button').addEventListener('click', () => {
-            const fileName = getFileName();
-            const fileContentElement = document.getElementById('file-content');
+        // 獲取文件名的函數
+        function getFileName() {
+            return getElement('file-name').value;
+        }
+
+        // 處理文件內容顯示的函數
+        function displayFileContent(fileName, data) {
+            const fileContentElement = getElement('file-content');
+            const newContent = getElement('new-content');
+            if (fileName.endsWith('.json')) {
+                try {
+                    const jsonObj = JSON.parse(data);
+                    const prettyJson = JSON.stringify(jsonObj, null, 2);
+                    fileContentElement.textContent = prettyJson;
+                    newContent.value = prettyJson; // 使用 value 屬性為 textarea 賦值
+                    fileContentElement.className = 'json-highlight';
+                } catch (error) {
+                    fileContentElement.textContent = '無法解析 JSON 內容';
+                }
+            } else {
+                fileContentElement.textContent = data;
+                newContent.value = data;
+                fileContentElement.className = '';
+            }
+        }
+
+        // 讀取文件的函數
+        function readFile(fileName) {
             fetch(`/read?fileName=${encodeURIComponent(fileName)}`)
                 .then(response => response.text())
-                .then(data => {
-                    // 檢查文件是否是 JSON
-                    if (fileName.endsWith('.json')) {
-                        try {
-                            // 嘗試解析 JSON 並美化
-                            const jsonObj = JSON.parse(data);
-                            const prettyJson = JSON.stringify(jsonObj, null, 2);
-                            fileContentElement.textContent = prettyJson;
-                            fileContentElement.className = 'json-highlight';
-                        } catch (error) {
-                            fileContentElement.textContent = '無法解析 JSON 內容';
-                        }
-                    } else {
-                        // 對於普通文本文件
-                        fileContentElement.textContent = data;
-                        fileContentElement.className = ''; // 移除任何特殊樣式
-                    }
-                })
+                .then(data => displayFileContent(fileName, data))
                 .catch(error => {
                     console.error('Error:', error);
-                    fileContentElement.textContent = '無法讀取文件';
+                    getElement('file-content').textContent = '無法讀取文件';
                 });
-        });
-        // 處理修改按鈕的點擊
-        document.getElementById('write-button').addEventListener('click', () => {
-            const fileName = getFileName();
-            const newContent = document.getElementById('new-content').value;
-            fetch('/write', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `fileName=${encodeURIComponent(fileName)}&content=${encodeURIComponent(newContent)}`
-            })
-                .then(response => response.text())
-                .then(data => {
-                    alert(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
+        }
 
-        // 處理刪除按鈕的點擊
-        document.getElementById('delete-button').addEventListener('click', () => {
-            const fileName = getFileName();
-            fetch(`/delete?fileName=${encodeURIComponent(fileName)}`, { method: 'DELETE' })
-                .then(response => response.text())
-                .then(data => {
-                    alert(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
-
-        //新增資料夾內文件選取
-        document.addEventListener('DOMContentLoaded', () => {
+        // 初始化文件名選擇器
+        function initFileSelector() {
             fetch('/list-files')
                 .then(response => response.json())
                 .then(files => {
-                    const select = document.getElementById('file-name');
+                    const select = getElement('file-name');
                     files.forEach(file => {
                         const option = document.createElement('option');
                         option.value = option.textContent = file;
@@ -162,6 +158,47 @@
                     });
                 })
                 .catch(error => console.error('Error:', error));
+        }
+
+        // 初始化事件監聽器
+        function initEventListeners() {
+            getElement('file-name').addEventListener('change', () => {
+                readFile(getFileName());
+            });
+
+            getElement('write-button').addEventListener('click', () => {
+                const fileName = getFileName();
+                const newContent = getElement('new-content').value;
+                fetch('/write', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `fileName=${encodeURIComponent(fileName)}&content=${encodeURIComponent(newContent)}`
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        alert(data); // 顯示伺服器響應
+                        // 更新左邊顯示區的內容
+                        const fileContentElement = getElement('file-content');
+                        fileContentElement.textContent = newContent;
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            getElement('delete-button').addEventListener('click', () => {
+                const fileName = getFileName();
+                fetch(`/delete?fileName=${encodeURIComponent(fileName)}`, { method: 'DELETE' })
+                    .then(response => response.text())
+                    .then(data => alert(data))
+                    .catch(error => console.error('Error:', error));
+            });
+        }
+
+        // 文件加載後初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initFileSelector();
+            initEventListeners();
         });
     </script>
 </body>
