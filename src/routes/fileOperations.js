@@ -16,7 +16,7 @@ export const readFile = async (fileName, res) => {
     try {
         const filePath = getFilePath(fileName);
         const data = await fs.readFile(filePath, 'utf8');
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end(data);
     } catch (error) {
         res.writeHead(404);
