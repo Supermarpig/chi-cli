@@ -31,7 +31,50 @@ function start(port) {
                 console.error(error);
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
                 res.end('Internal Server Error');
-            });
+            })
+        }
+        else if (method === 'GET' && pathname.startsWith('/read/')) {
+            const pathParts = pathname.split('/').filter(part => part.length);
+            if (pathParts.length === 2) {
+                const dataType = pathParts[1];
+                const fileName = query.get('fileName'); // 獲取文件名
+                const fileExtension = fileName.split('.').pop().toLowerCase(); // 獲取文件擴展名
+
+                try {
+                    const filePath = `./data/${fileName}`;
+                    const fileContent = await fs.readFile(filePath, 'utf-8');
+
+                    // 根據文件類型處理內容
+                    switch (fileExtension) {
+                        case 'json':
+                            const jsonData = JSON.parse(fileContent);
+                            if (jsonData[dataType]) {
+                                res.writeHead(200, { 'Content-Type': 'application/json' });
+                                res.end(JSON.stringify(jsonData[dataType]));
+                            } else {
+                                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                                res.end('Data type not found');
+                            }
+                            break;
+                        case 'txt':
+                        case 'csv':
+                            // 對於 TXT 和 CSV 文件，直接返回文件內容
+                            res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+                            res.end(fileContent);
+                            break;
+                        default:
+                            res.writeHead(400, { 'Content-Type': 'text/plain' });
+                            res.end('Unsupported file type');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Internal Server Error');
+                }
+            } else {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Invalid path');
+            }
         } else if (method === 'POST' && pathname === '/write') {
             let body = '';
             req.on('data', chunk => body += chunk);
