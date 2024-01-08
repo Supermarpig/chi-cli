@@ -13,8 +13,16 @@ const argv = yargs(hideBin(process.argv))
   .command("init", "Create a new, empty changelog", () => {
     changelog.initChangelog();
   })
-  .command('start', 'Start the JSON server', () => {
-    start();
+  .command('start', 'Start the JSON server', (yargs) => {
+    return yargs.option("port", {
+      alias: "p",
+      describe: "Port to run the server on",
+      default: 8787, 
+      type: "number",
+    });
+  }, (argv) => {
+    const port = argv.port;
+    start(port); 
   })
   .command("add", "Adds a new line to the changelog", (yargs) => {
     return yargs.option("m", {
